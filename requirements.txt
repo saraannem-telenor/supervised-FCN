@@ -8,3 +8,5 @@ scipy
 sktime
 torchmetrics
 wget
+pytorch_lightning==1.9.0
+wandb

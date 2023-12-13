@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
 
-from supervised_FCN.utils import get_root_dir
+from utils import get_root_dir
 
 
 class DatasetImporterUCR(object):
@@ -89,6 +89,7 @@ class UCRDataset(Dataset):
     def getitem_default(self, idx):
         x, y = self.X[idx, :], self.Y[idx, :]
         x = x[None, :]  # adds a channel dim
+        print(type(y))
         return x, y
 
     def __getitem__(self, idx):

@@ -2,9 +2,9 @@ import torchmetrics
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from sklearn.metrics import accuracy_score
 
-from supervised_FCN.models.fcn import FCNBaseline
-from supervised_FCN.experiments.exp_base import *
-from supervised_FCN.utils import *
+from models.fcn import FCNBaseline
+from experiments.exp_base import *
+from utils import *
 
 
 class ExpFCN(ExpBase):

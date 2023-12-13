@@ -1,0 +1,80 @@
+### Data parameters
+
+data_dir: 
+  train: 'datasets/train/TRAIN.pkl'
+  test: 'datasets/test/TEST.pkl'
+static_cat : #[] #variables that are static throughout the time series and are categorical valued (e.g. strings, integers)
+  #- 'sector' #data is already preprocessed so that input are integers starting from 0
+  - "sector_id" #no need to list the number of sectors in num_cat variable, it will be read automatically
+static_real : [] #variables that are static throughout the time series and are real valued
+  # - 'lat'
+  # - 'lon'
+  # - 'mcdr_nom_s_mean'
+  # - 'mcdr_nom_s_std'
+  # - 'mcdr_nom_d_mean'
+  # - 'mcdr_nom_d_std'
+  # - 'mcdr_denom_mean'
+  # - 'mcdr_denom_std'
+  # - 'msdr_nom_s_mean'
+  # - 'msdr_nom_s_std'
+  # - 'msdr_nom_d_mean'
+  # - 'msdr_nom_d_std'
+  # - 'msdr_denom_mean'
+  # - 'msdr_denom_std'
+  # - 'thp_nom_tt_kpi_mean'
+  # - 'thp_nom_tt_kpi_std'
+  # - 'thp_denom_tt_kpi_mean'
+  # - 'thp_denom_tt_kpi_std'
+  # - 'ho_nom_mean'
+  # - 'ho_nom_std'
+  # - 'ho_denom_mean'
+  # - 'ho_denom_std'
+dynamic_cat : [] #variables that vary throughout the time series and are categorical valued (e.g.holidays, special events)
+  # - 'weekday'
+  # - 'weekend'
+  # - 'hour'
+  # - 'is_holiday'
+  # - 'msdr_denom_nan'
+  # - 'mcdr_denom_nan'
+dynamic_real : #variables that vary throughout the time series and are real valued (the ones one wants to do anomaly detection on)
+  # - 'mcdr_nom_s'
+  # - 'mcdr_nom_d'
+  # - 'mcdr_denom'
+  # - 'msdr_nom_s'
+  # - 'msdr_nom_d'
+  - 'msdr_denom'
+  # - 'thp_nom_tt_kpi'
+  # - 'thp_denom_tt_kpi'
+  # - 'ho_nom'
+  # - 'ho_denom'
+num_static_cat_categories : #[] #number of categories for each static categorical variable
+  # - 3 #sector
+  - sector_id : the algorithm takes care on its own to list how many sector IDs there are if included in static_cat
+num_dynamic_cat_categories: [] #number of categories for each time var categorical variable
+  # - 7 #weekday
+  # - 2 #weekend
+  # - 24 #hour
+  # - 2 #is_holiday
+  # - 2 #msdr_denom_nan
+  # - 2 #mcdr_denom_nan
+col_for_groupby: 'sector_id'
+#scale_on: "Cell Name"
+time_col: 'time_period'
+col_for_nan_cnt: 'msdr_denom'
+nan_limit: 10 #drop units that have more than min_nan_count nan values
+# output:
+#   - 'mcdr_nom_s'
+#   - 'mcdr_nom_d'
+#   - 'mcdr_denom'
+#   - 'msdr_nom_s'
+#   - 'msdr_nom_d'
+#   - 'msdr_denom'
+#   - 'thp_nom_tt_kpi'
+#   - 'thp_denom_tt_kpi'
+#   - 'ho_nom'
+#   - 'ho_denom'
+
+window_len: 48 #48, 72
+window_stride: 48
+scaler: 'MinMax' # "MinMax", "MaxAbs", "Standard", "Robust", "Quantile"
+
