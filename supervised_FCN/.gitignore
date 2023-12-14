@@ -134,6 +134,8 @@ wandb/
 datasets/*
 !datasets/__init__.py
 !datasets/DataSummary_UCR.csv
+!datasets/Telenor_DK
+!datasets/Telenor_DK/scalers
 train_fcn_all_datasets.py
 saved_models/*.ckpt
 saved_models/*.zip
