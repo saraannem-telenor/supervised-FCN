@@ -1,8 +1,8 @@
 ### Data parameters
 
 data_dir: 
-  train: 'datasets/train/TRAIN.pkl'
-  test: 'datasets/test/TEST.pkl'
+  train: 'datasets/Telenor_DK/TRAIN.pkl'
+  test: 'datasets/Telenor_DK/TEST.pkl'
 static_cat : #[] #variables that are static throughout the time series and are categorical valued (e.g. strings, integers)
   #- 'sector' #data is already preprocessed so that input are integers starting from 0
   - "sector_id" #no need to list the number of sectors in num_cat variable, it will be read automatically
