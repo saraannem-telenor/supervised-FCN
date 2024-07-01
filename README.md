@@ -63,7 +63,7 @@ IS_mean, IS_std = calculate_inception_score(p_yx.cpu().detach().numpy())
 # Training
 
 ## Prerequisite for Training
-You need to download the UCR archive dataset and put it in `supervised_FCN/datasets/`. You can download it from [here](https://studntnu-my.sharepoint.com/:u:/g/personal/daesool_ntnu_no/EUVHWAlJRrZBnCZMAOdTR-cB3m_LP7Q10Y78meuzUAuIBQ?e=h9aGhi).
+You need to download the UCR archive dataset and put it in `supervised_FCN/datasets/`. You can download it from [here](https://figshare.com/articles/dataset/UCR_Archive_2018/21359775).
 Then, your `supervised_FCN/datasets` directory should have `supervised_FCN/datasets/UCRArchive_2018`.
 
 ## Training
@@ -98,10 +98,12 @@ A training and test dataset split is the same as provided in the UCR archive, an
 
 # Citation
 ```
-@article{lee2023vector,
+@inproceedings{lee2023vector,
   title={Vector Quantized Time Series Generation with a Bidirectional Prior Model},
   author={Lee, Daesoo and Malacarne, Sara and Aune, Erlend},
-  journal={arXiv preprint arXiv:2303.04743},
-  year={2023}
+  booktitle={International Conference on Artificial Intelligence and Statistics},
+  pages={7665--7693},
+  year={2023},
+  organization={PMLR}
 }
 ```
