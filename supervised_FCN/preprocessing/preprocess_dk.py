@@ -3,6 +3,7 @@
 
 from typing import Union
 import math
+import os
 
 import numpy as np
 import pandas as pd
@@ -34,60 +35,22 @@ def get_scaler(scaler: str):
         raise ValueError
     return scalers[scaler]
 
-def read_units(path_to_file: Path) -> list:
+
+def write_units(kind: str, config: dict):
     """
-    This function reads a list in a .txt file, returning a list.
-    It is used to list the "units", i.e. unique time series in the data,
-    used for training.
-    :param path_to_file: path to the .txt file used to read from
-    """
-
-    return path_to_file.read_text().strip().split("\n")
-
-
-def write_units(kind: str, config: dict):   
-    col_for_groupby = config['col_for_groupby']
-    path_desired_units = get_root_dir().joinpath("configs/units_for_training.txt")
-    nan_limit = config['nan_limit']
-    window_len = config['window_len']
-
-    data_root = get_root_dir().joinpath("datasets", "Telenor_DK")
-    # fetch an entire dataset
+    This function takes pre-generated text files with units. Returns a list of strings.
+    These are currently generated from the TRAIN/TEST pickle files by generate_units_dk.py
+    (also filtered by null values and window length) and are specified in config_data_dk.yaml.
+    """   
+    units_train = get_root_dir().joinpath(config['units_files']['units_for_training'])
+    units_test = get_root_dir().joinpath(config['units_files']['units_for_testing'])
     if kind == 'train':
-        df = pd.read_pickle(data_root.joinpath("TRAIN.pkl"))
+        units = open(units_train).read().splitlines()
     elif kind == 'test':
-        df = pd.read_pickle(data_root.joinpath("TEST.pkl"))
+        units = open(units_test).read().splitlines()
 
+    return units[:100] #PO: using the first 100 units for now
 
-    units = df[col_for_groupby].dropna().unique().tolist()
-    if path_desired_units.is_file() and (path_desired_units.stat().st_size > 0):
-        desired_units = read_units(path_desired_units)
-        units = list(set(units) & set(desired_units))
-    df = df[df[col_for_groupby].isin(units)]
-
-    min_unit_count = (
-        df.groupby(col_for_groupby, sort=False)
-        .agg({col: "count" for col in df.columns if col != col_for_groupby})
-        .min(axis=1)
-        .values
-    )
-    unit_size = df.groupby(col_for_groupby, sort=False).size()
-    nan_percentage = 100 * (unit_size.values - min_unit_count) / unit_size.values
-    min_number_values = 2 * (window_len)
-    nan_units = unit_size.index.values[
-        (nan_percentage > nan_limit) | (unit_size.values < min_number_values)
-    ]
-    nan_units = sorted(nan_units.tolist())
-
-    df = df[~df[col_for_groupby].isin(nan_units)]
-    units = sorted(df[col_for_groupby].dropna().unique().tolist())
-
-    return units
-
-## have to create a function that reads both datasets and outputs the filtered datasets
-# not sure whether it is more convenient to save them! otherwise I have to read them twice, 
-# one time for filtering and one for preprocessing 
-#  
 
 class DatasetImporterDK(object):
     """
@@ -99,8 +62,10 @@ class DatasetImporterDK(object):
         :param dataset_name: e.g., "ElectricDevices"
         :param data_scaling
         """
-        self.data_root = get_root_dir().joinpath("datasets", "Telenor_DK")
-        self.dir_scalers = get_root_dir().joinpath("datasets/Telenor_DK", "scalers")
+        #self.data_root = get_root_dir().joinpath(config['data_dir']['data_root']) # PO: check config_data_dk
+        self.data_root = config['data_dir']['data_root']
+        #self.dir_scalers = get_root_dir().joinpath(config['data_dir']['data_root'], "scalers")
+        self.dir_scalers = os.path.join(config['data_dir']['data_root'], "scalers")
 
         static_real = config['static_real']
         static_cat = config['static_cat']
@@ -108,18 +73,20 @@ class DatasetImporterDK(object):
         dynamic_real = config['dynamic_real']
         col_for_groupby = config['col_for_groupby']
         time_col = config['time_col']
-    
+        #units = config['units']
+
         # fetch an entire dataset
         if kind == 'train':
-            df = pd.read_pickle(self.data_root.joinpath("TRAIN.pkl"))
+            #df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['train_pkl']))
+            df = pd.read_pickle(os.path.join(self.data_root, config['data_dir']['train_pkl']))
         elif kind == 'test':
-            df = pd.read_pickle(self.data_root.joinpath("TEST.pkl"))
-        
-        # Filling nan values, check with Daesoo
+            #df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['test_pkl']))
+            df = pd.read_pickle(os.path.join(self.data_root, config['data_dir']['test_pkl']))
+
+        # Filling nan values, TODO: improve this
         df = df[df[col_for_groupby].isin(units)]
         df = df.fillna(0)
-
-        df.to_pickle(self.data_root.joinpath("TRAIN_small.pkl"))
+        print(kind, df.shape)
 
         if data_scaling:
             scaler = {}
@@ -138,7 +105,8 @@ class DatasetImporterDK(object):
                     labelencoder = LabelEncoder().fit(df[cat])
                     scaler["static_cat"] = labelencoder
                 else:
-                    pkl_file = open(self.dir_scalers.joinpath("scaler_static_cat.pkl"), "rb")
+                    #pkl_file = open(self.dir_scalers.joinpath("scaler_static_cat.pkl"), "rb")
+                    pkl_file = open(os.path.join(self.dir_scalers, "scaler_static_cat.pkl"), "rb")
                     scaler["static_cat"] = pickle.load(pkl_file)
                     pkl_file.close()
                 df[cat] = scaler["static_cat"].transform(df[cat])
@@ -149,7 +117,8 @@ class DatasetImporterDK(object):
                         labelencoder = LabelEncoder().fit(df[cat])
                         scaler["dynamic_cat"] = labelencoder
                     else:
-                        pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_cat.pkl"), "rb")
+                        #pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_cat.pkl"), "rb")
+                        pkl_file = open(os.path.join(self.dir_scalers, "scaler_dynamic_cat.pkl"), "rb")
                         scaler["dynamic_cat"] = pickle.load(pkl_file)
                         pkl_file.close()
                     df[cat] = scaler["dynamic_cat"].transform(df[cat])
@@ -180,7 +149,8 @@ class DatasetImporterDK(object):
                             dynamic_real_arr
                         )
                     else:
-                        pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_real.pkl"), "rb")
+                        #pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_real.pkl"), "rb")
+                        pkl_file = open(os.path.join(self.dir_scalers, "scaler_dynamic_real.pkl"), "rb")
                         scaler["dynamic_real"] = pickle.load(pkl_file)
                         pkl_file.close()
                     dynamic_real_arr = scaler["dynamic_real"].transform(dynamic_real_arr)
@@ -198,7 +168,8 @@ class DatasetImporterDK(object):
 
             if kind == "train":
                 for split in scaler:
-                    output = open(self.dir_scalers.joinpath(f"scaler_{split}.pkl"), "wb")
+                    #output = open(self.dir_scalers.joinpath(f"scaler_{split}.pkl"), "wb")
+                    output = open(os.path.join(self.dir_scalers, f"scaler_{split}.pkl"), "wb")
                     pickle.dump(scaler[split], output)
                     output.close()
 
@@ -262,6 +233,7 @@ class DKDataset(Dataset):
         x = self.X[index:end].reshape(self.window_len)
         y = np.array([self.Y[index]])
         x = x[None, :]  # adds a channel dim
+        #print("y shape", y.shape)
         return x, y
 
     def __len__(self):
