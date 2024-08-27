@@ -89,7 +89,7 @@ nan_limit: 10 #drop units that have more than min_nan_count nan values
 #   - 'ho_nom'
 #   - 'ho_denom'
 
-input_len: 24 #48, 72
-window_stride: 24
+window_len: 48 #48, 72
+window_stride: 48
 scaler: 'MinMax' # "MinMax", "MaxAbs", "Standard", "Robust", "Quantile"
 
