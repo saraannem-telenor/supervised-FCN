@@ -56,7 +56,7 @@ class DatasetImporterDK(object):
     This uses train and test sets as given.
     To compare with the results from ["Unsupervised scalable representation learning for multivariate time series"]
     """
-    def __init__(self, kind:str, data_scaling: bool, config: dict):
+    def __init__(self, units:list, kind:str, data_scaling: bool, config: dict):
         """
         :param dataset_name: e.g., "ElectricDevices"
         :param data_scaling
@@ -70,7 +70,7 @@ class DatasetImporterDK(object):
         dynamic_real = config['dynamic_real']
         col_for_groupby = config['col_for_groupby']
         time_col = config['time_col']
-        units = config['units']
+        #units = config['units']
 
         # fetch an entire dataset
         if kind == 'train':
@@ -180,7 +180,7 @@ class DKDataset(Dataset):
         """
         super().__init__()
         self.kind = kind
-        self.window_len = config['input_len']
+        self.window_len = config['window_len']
         self.window_stride = config['window_stride']
         col_for_groupby = config['col_for_groupby']
 
