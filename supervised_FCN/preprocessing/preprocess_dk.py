@@ -3,6 +3,7 @@
 
 from typing import Union
 import math
+import os
 
 import numpy as np
 import pandas as pd
@@ -61,8 +62,10 @@ class DatasetImporterDK(object):
         :param dataset_name: e.g., "ElectricDevices"
         :param data_scaling
         """
-        self.data_root = get_root_dir().joinpath(config['data_dir']['data_root'])
-        self.dir_scalers = get_root_dir().joinpath(config['data_dir']['data_root'], "scalers")
+        #self.data_root = get_root_dir().joinpath(config['data_dir']['data_root']) # PO: check config_data_dk
+        self.data_root = config['data_dir']['data_root']
+        #self.dir_scalers = get_root_dir().joinpath(config['data_dir']['data_root'], "scalers")
+        self.dir_scalers = os.path.join(config['data_dir']['data_root'], "scalers")
 
         static_real = config['static_real']
         static_cat = config['static_cat']
@@ -74,9 +77,11 @@ class DatasetImporterDK(object):
 
         # fetch an entire dataset
         if kind == 'train':
-            df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['train_pkl']))
+            #df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['train_pkl']))
+            df = pd.read_pickle(os.path.join(self.data_root, config['data_dir']['train_pkl']))
         elif kind == 'test':
-            df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['test_pkl']))
+            #df = pd.read_pickle(self.data_root.joinpath(config['data_dir']['test_pkl']))
+            df = pd.read_pickle(os.path.join(self.data_root, config['data_dir']['test_pkl']))
 
         # Filling nan values, TODO: improve this
         df = df[df[col_for_groupby].isin(units)]
@@ -100,7 +105,8 @@ class DatasetImporterDK(object):
                     labelencoder = LabelEncoder().fit(df[cat])
                     scaler["static_cat"] = labelencoder
                 else:
-                    pkl_file = open(self.dir_scalers.joinpath("scaler_static_cat.pkl"), "rb")
+                    #pkl_file = open(self.dir_scalers.joinpath("scaler_static_cat.pkl"), "rb")
+                    pkl_file = open(os.path.join(self.dir_scalers, "scaler_static_cat.pkl"), "rb")
                     scaler["static_cat"] = pickle.load(pkl_file)
                     pkl_file.close()
                 df[cat] = scaler["static_cat"].transform(df[cat])
@@ -111,7 +117,8 @@ class DatasetImporterDK(object):
                         labelencoder = LabelEncoder().fit(df[cat])
                         scaler["dynamic_cat"] = labelencoder
                     else:
-                        pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_cat.pkl"), "rb")
+                        #pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_cat.pkl"), "rb")
+                        pkl_file = open(os.path.join(self.dir_scalers, "scaler_dynamic_cat.pkl"), "rb")
                         scaler["dynamic_cat"] = pickle.load(pkl_file)
                         pkl_file.close()
                     df[cat] = scaler["dynamic_cat"].transform(df[cat])
@@ -142,7 +149,8 @@ class DatasetImporterDK(object):
                             dynamic_real_arr
                         )
                     else:
-                        pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_real.pkl"), "rb")
+                        #pkl_file = open(self.dir_scalers.joinpath("scaler_dynamic_real.pkl"), "rb")
+                        pkl_file = open(os.path.join(self.dir_scalers, "scaler_dynamic_real.pkl"), "rb")
                         scaler["dynamic_real"] = pickle.load(pkl_file)
                         pkl_file.close()
                     dynamic_real_arr = scaler["dynamic_real"].transform(dynamic_real_arr)
@@ -160,7 +168,8 @@ class DatasetImporterDK(object):
 
             if kind == "train":
                 for split in scaler:
-                    output = open(self.dir_scalers.joinpath(f"scaler_{split}.pkl"), "wb")
+                    #output = open(self.dir_scalers.joinpath(f"scaler_{split}.pkl"), "wb")
+                    output = open(os.path.join(self.dir_scalers, f"scaler_{split}.pkl"), "wb")
                     pickle.dump(scaler[split], output)
                     output.close()
 

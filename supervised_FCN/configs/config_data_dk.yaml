@@ -1,7 +1,7 @@
 ### Data parameters
 
 data_dir: 
-  data_root: 'datasets/Telenor_DK'
+  data_root: '/home/portiz/timevqvae_tnr/datasets/Telenor_DK'
   train_pkl: 'TRAIN.pkl' # place inside data_root
   test_pkl: 'TEST.pkl' # place inside data_root
 
@@ -62,9 +62,9 @@ dynamic_real : #variables that vary throughout the time series and are real valu
   # - 'thp_denom_tt_kpi'
   # - 'ho_nom'
   # - 'ho_denom'
-num_static_cat_categories : [] #number of categories for each static categorical variable
+num_static_cat_categories : #[] #number of categories for each static categorical variable
   # - 3 #sector
-  #- sector_id : the algorithm takes care on its own to list how many sector IDs there are if included in static_cat
+  # - sector_id : the algorithm takes care on its own to list how many sector IDs there are if included in static_cat
 num_dynamic_cat_categories: [] #number of categories for each time var categorical variable
   # - 7 #weekday
   # - 2 #weekend
