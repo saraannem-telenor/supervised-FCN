@@ -49,7 +49,7 @@ def write_units(kind: str, config: dict):
     elif kind == 'test':
         units = open(units_test).read().splitlines()
 
-    return units[:100] #PO: using the first 100 units for now
+    return units[:10] #PO: using the first 10 units for now
 
 
 class DatasetImporterDK(object):

@@ -15,5 +15,5 @@ trainer_params:
   devices: [0] # if cpu use auto
                 # if gpu use auto or -1 for all gpus. For a subset use e.g.
                 # 3 --> [0,1,2] or just list them [0,1,3,4] if gpu0 then [0]
-  max_epochs: 1000
+  max_epochs: 50 #1000
 
